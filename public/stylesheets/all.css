@@ -1,0 +1,5 @@
+.fixed-size {
+    width: 270px; /* 设置宽度 */
+    height: 150px; /* 设置高度 */
+    object-fit: cover; /* 按比例填充图片，保持长宽比 */
+}
