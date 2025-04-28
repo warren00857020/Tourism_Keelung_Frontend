@@ -13,7 +13,7 @@ exports.getSightsByZone = async (req, res) => {
     try {
         const keyword = req.query.keyword;
 
-        const response = await axios.get('http://localhost:8080/sights?keyword='+keyword);
+        const response = await axios.get('http://spring:8080/sights?keyword='+keyword);
         
         const sightsData = response.data;
 

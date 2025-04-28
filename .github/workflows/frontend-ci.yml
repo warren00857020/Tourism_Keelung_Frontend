@@ -1,0 +1,86 @@
+# This pipeline installs dependencies, runs tests/lint, and (on main) builds & pushes a Docker image.
+
+name: CI – Tourism Keelung Frontend
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+# ------------------------------------------------------------------------------
+# Environment variables shared across steps
+# ------------------------------------------------------------------------------
+env:
+  REGISTRY_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/tourism_keelung_frontend
+
+jobs:
+  test-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      # ------------------------------- Node.js setup ---------------------------
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          # Use the latest LTS; change if you target a specific version
+          node-version: 20
+          # Enable dependency caching based on package‑lock.json / pnpm‑lock.yaml
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          # If you switch to pnpm or yarn, replace this command accordingly
+          npm ci
+
+      # ------------------------------- Quality gates ---------------------------
+      - name: Run unit tests
+        run: |
+          # Will be skipped if no test script is defined
+          npm test --if-present
+
+      - name: Lint code
+        run: |
+          # Optional – remove if you don't have a lint script
+          npm run lint --if-present
+
+      # ----------------------------- Production build --------------------------
+      - name: Build production bundle
+        run: |
+          # For pure Express.js apps this may do nothing, but keeps parity with other repos
+          npm run build --if-present
+
+      # -------------------------- Container build & push -----------------------
+      # Only push images for commits that land on main (not for PRs)
+      - name: Log in to Docker Hub
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}  # set in repo secrets
+          password: ${{ secrets.DOCKERHUB_TOKEN }}     # Docker Hub PAT
+
+      - name: Set up QEMU (multi‑arch, optional)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build & push Docker image
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile     # make sure you have a Dockerfile in repo root
+          push: true
+          tags: |
+            ${{ env.REGISTRY_IMAGE }}:latest
+            ${{ env.REGISTRY_IMAGE }}:${{ github.sha }}
+          cache-from: type=registry,ref=${{ env.REGISTRY_IMAGE }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY_IMAGE }}:buildcache,mode=max
