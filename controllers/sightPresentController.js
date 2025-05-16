@@ -1,36 +1,14 @@
-const axios = require('axios');
-
-// exports.createSight = async (newSight) => {
-//     try {
-//         const response = await axios.post('http://localhost:8080/sights', newSight);
-//         console.log('Created sight:', response.data);
-//     } catch (error) {
-//         console.error('Error creating sight:', error.message);
-//     }
-// };
+// controllers/sightPresentController.js
+const api = require('../utils/api');
 
 exports.getSightsByZone = async (req, res) => {
-    try {
-        const keyword = req.query.keyword;
+  try {
+    const keyword = req.query.keyword || '';
+    const { data } = await api.getSightsByZone(keyword);   // ← 共用 util
 
-        const response = await axios.get('http://spring:8080/sights?keyword='+keyword);
-        
-        const sightsData = response.data;
-
-        // console.log('Sights Data:', sightsData);
-
-        // 返回结果
-        res.render(
-            'sightPresent',
-            {sights:sightsData}
-        );
-    } catch (error) {
-        console.error('Error:', error.message);
-        res.status(500).send({
-            status: 'error',
-            message: 'Internal server error'
-        });
-    }
+    res.render('sightPresent', { sights: data });
+  } catch (err) {
+    console.error('Error:', err.message);
+    res.status(500).send({ status: 'error', message: 'Internal server error' });
+  }
 };
-
-

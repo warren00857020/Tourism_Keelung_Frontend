@@ -25,7 +25,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/index', indexRouter);// 當網頁URI是 localhost:3000/index，去indexRouter出裡
 app.use('/sightPresent', sightPresent);
 
-const port = 3000;
+const port = 3001;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
