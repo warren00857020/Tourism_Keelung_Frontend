@@ -6,10 +6,10 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-
+  
+permissions:                # ★ 加在最上層，或加在 job 裡也可以
+  contents: read
+  id-token: write           # ← OIDC 一定要有
 # ------------------------------------------------------------------------------
 # Environment variables shared across steps
 # ------------------------------------------------------------------------------
