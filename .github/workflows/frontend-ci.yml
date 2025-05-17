@@ -102,7 +102,6 @@ jobs:
           flags: |
             --service-account=github-ci@nth-fiber-459808-b5.iam.gserviceaccount.com
             --allow-unauthenticated
-          platform: managed
 
           env_vars: |
             API_BASE_URL=https://myapp-344952852961.asia-east1.run.app
