@@ -99,9 +99,10 @@ jobs:
           service: tourism-frontend          # Cloud Run service name
           image: ${{ env.REGISTRY_IMAGE }}:${{ github.sha }}
           region: asia-east1
-          # 前端只有靜態檔，最低規格即可
-          service_account: github-ci@nth-fiber-459808-b5.iam.gserviceaccount.com   # ★
+          flags: |
+            --service-account=github-ci@nth-fiber-459808-b5.iam.gserviceaccount.com
+            --allow-unauthenticated
           platform: managed
-          allow-unauthenticated: true
+
           env_vars: |
             API_BASE_URL=https://myapp-344952852961.asia-east1.run.app
