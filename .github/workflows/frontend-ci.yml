@@ -100,7 +100,7 @@ jobs:
           image: ${{ env.REGISTRY_IMAGE }}:${{ github.sha }}
           region: asia-east1
           # 前端只有靜態檔，最低規格即可
-          # service_account: github-ci@nth-fiber-459808-b5.iam.gserviceaccount.com   # ★
+          service_account: github-ci@nth-fiber-459808-b5.iam.gserviceaccount.com   # ★
           platform: managed
           allow-unauthenticated: true
           env_vars: |
